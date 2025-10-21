@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pothole Detection Dashboard</title>
+
+    <style>
+        :root {
+            --primary: #00eeff;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: #0f172a;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+
+        /* Dashboard layout */
+        .dashboard {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Video feed card */
+        .video-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .video-card h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .video-feed {
+            width: 100%;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow);
+            object-fit: cover;
+        }
+
+        /* Stats panel */
+        .stats-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stats-card h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 6px;
+            margin-bottom: 15px;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: #1e293b;
+            border-left: 5px solid var(--primary);
+            padding: 12px 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .stat-item:hover {
+            background: #27364a;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: #0f172a;
+            text-align: center;
+            padding: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: var(--shadow);
+            flex-shrink: 0;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.3rem;
+                padding: 1rem;
+            }
+            .video-card, .stats-card {
+                padding: 12px;
+            }
+            .stat-value {
+                font-size: 1.1rem;
+            }
+            .video-card h2, .stats-card h2 {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Smooth fade animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .video-card, .stats-card {
+            animation: fadeIn 0.6s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>Pothole Detection Dashboard</header>
+
+    <!-- Main Dashboard -->
+    <div class="dashboard">
+        <!-- Video Feed Section -->
+        <div class="video-card">
+            <h2>Detection Feed</h2>
+            <img src="{{ url_for('video_feed') }}" class="video-feed" alt="Pothole Detection Feed">
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="stats-card">
+            <h2>Detection Stats</h2>
+            <div class="stats-list">
+                <div class="stat-item">
+                    <div class="stat-label">System Status</div>
+                    <div class="stat-value">Running</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-label">Detected Potholes</div>
+                    <div class="stat-value" id="detection-count">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        Real-Time Road Condition Monitoring | Powered by Machine Learning
+    </footer>
+
+    <!-- Live Detection Count Update -->
+    <script>
+        function updateDetectionCount() {
+            fetch('/detection_count')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('detection-count').innerText = data.detections;
+                })
+                .catch(err => console.error('Error fetching count:', err));
+        }
+        setInterval(updateDetectionCount, 1000);
+        updateDetectionCount();
+    </script>
+</body>
+</html>
